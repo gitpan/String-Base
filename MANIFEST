@@ -1,4 +1,4 @@
-.cvsignore
+.gitignore
 Build.PL
 Changes
 MANIFEST
@@ -6,7 +6,6 @@ META.json
 META.yml
 Makefile.PL
 README
-lib/String/.cvsignore
 lib/String/Base.pm
 lib/String/Base.xs
 t/index.t

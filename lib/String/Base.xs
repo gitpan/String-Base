@@ -43,6 +43,7 @@ static SV *base_hint_key_sv;
 static U32 base_hint_key_hash;
 static OP *(*nxck_substr)(pTHX_ OP *o);
 static OP *(*nxck_index)(pTHX_ OP *o);
+static OP *(*nxck_rindex)(pTHX_ OP *o);
 static OP *(*nxck_pos)(pTHX_ OP *o);
 
 #define current_base() THX_current_base(aTHX)
@@ -110,7 +111,8 @@ static OP *myck_index(pTHX_ OP *op)
 			iop->op_sibling = rest;
 			nop->op_sibling = iop;
 		}
-		op = nxck_index(aTHX_ op);
+		op = (op->op_type == OP_INDEX ? nxck_index : nxck_rindex)
+			(aTHX_ op);
 		if((PL_opargs[op->op_type] & OA_TARGET) && !op->op_targ)
 			op->op_targ = pad_alloc(op->op_type, SVs_PADTMP);
 		return newBINOP(OP_I_ADD, 0, op_contextualize(op, G_SCALAR),
@@ -141,10 +143,7 @@ static OP *THX_gen_dup_op(pTHX_ OP *argop)
 	return dupop;
 }
 
-#if PERL_VERSION_GE(5,9,4)
-# define gen_foldsafe_null_op() newOP(OP_NULL, 0)
-#else /* <5.10.0 */
-# define gen_foldsafe_null_op() THX_gen_foldsafe_null_op(aTHX)
+#define gen_foldsafe_null_op() THX_gen_foldsafe_null_op(aTHX)
 static OP *THX_gen_foldsafe_null_op(pTHX)
 {
 	OP *op = newOP(OP_PUSHMARK, 0);
@@ -152,7 +151,6 @@ static OP *THX_gen_foldsafe_null_op(pTHX)
 	op->op_ppaddr = PL_ppaddr[OP_NULL];
 	return op;
 }
-#endif /* <5.10.0 */
 
 static OP *myck_pos(pTHX_ OP *op)
 {
@@ -181,6 +179,7 @@ BOOT:
 	base_hint_key_hash = SvSHARED_HASH(base_hint_key_sv);
 	nxck_substr = PL_check[OP_SUBSTR]; PL_check[OP_SUBSTR] = myck_substr;
 	nxck_index = PL_check[OP_INDEX]; PL_check[OP_INDEX] = myck_index;
+	nxck_rindex = PL_check[OP_RINDEX]; PL_check[OP_RINDEX] = myck_index;
 	nxck_pos = PL_check[OP_POS]; PL_check[OP_POS] = myck_pos;
 
 void

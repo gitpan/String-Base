@@ -54,7 +54,8 @@ substring splicing (C<substr $a, 3, 2, "x">)
 
 =item *
 
-substring searching (C<index($a, "x")> and C<index($a, "x", 3)>)
+substring searching (C<index($a, "x")>, C<index($a, "x", 3)>,
+C<rindex($a, "x")>, C<rindex($a, "x", 3)>)
 
 =item *
 
@@ -70,12 +71,12 @@ is numerically less than the index offset will have unpredictable results.
 =head2 Differences from C<$[>
 
 This module is a replacement for the historical L<C<$[>|perlvar/$[>
-variable.  In early Perl that variable was a runtime global, affecting
-all array and string indexing in the program.  In Perl 5, assignment to
-C<$[> acts as a lexically-scoped pragma.  C<$[> is highly deprecated,
-and the mechanism that supports it is due to be removed in Perl 5.15.
-This module reimplements the index offset feature without using the
-deprecated mechanism.
+variable.  In early Perl that variable was a runtime global, affecting all
+array and string indexing in the program.  In Perl 5, assignment to C<$[>
+acts as a lexically-scoped pragma.  C<$[> is deprecated.  The original
+C<$[> was removed in Perl 5.15.3, and later replaced in Perl 5.15.5 by
+an automatically-loaded L<arybase> module.  This module reimplements
+the index offset feature without any specific support from the core.
 
 Unlike C<$[>, this module does not affect indexing into arrays.  This
 module is concerned only with strings.  To influence array indexing,
@@ -109,12 +110,11 @@ where the operator appears.
 package String::Base;
 
 { use 5.008001; }
+use Lexical::SealRequireHints 0.006;
 use warnings;
 use strict;
 
-use Lexical::SealRequireHints 0.005;
-
-our $VERSION = "0.000";
+our $VERSION = "0.001";
 
 require XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
@@ -157,6 +157,7 @@ propagate into string eval.
 =head1 SEE ALSO
 
 L<Array::Base>,
+L<arybase>,
 L<perlvar/$[>
 
 =head1 AUTHOR
@@ -165,7 +166,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2011 Andrew Main (Zefram) <zefram@fysh.org>
+Copyright (C) 2011, 2012 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE
 

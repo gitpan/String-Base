@@ -6,7 +6,6 @@ use Module::Build;
 
 Module::Build->new(
 	module_name => "String::Base",
-	dist_version => "0.000",
 	license => "perl",
 	configure_requires => {
 		"Module::Build" => 0,
@@ -23,11 +22,14 @@ Module::Build->new(
 		"warnings" => 0,
 	},
 	requires => {
-		"Lexical::SealRequireHints" => "0.005",
+		"Lexical::SealRequireHints" => "0.006",
 		"XSLoader" => 0,
 		"perl" => "5.008001",
 		"strict" => 0,
 		"warnings" => 0,
+	},
+	conflicts => {
+		"B::Hooks::OP::Check" => "< 0.19",
 	},
 	dynamic_config => 0,
 	meta_add => { distribution_type => "module" },
